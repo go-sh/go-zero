@@ -56,7 +56,7 @@ func TestGetTemplateDir(t *testing.T) {
 		if err != nil {
 			return
 		}
-		assert.Contains(t, dir, version.BuildVersion)
+		assert.Contains(t, dir, version.GetGoctlVersion())
 	})
 }
 

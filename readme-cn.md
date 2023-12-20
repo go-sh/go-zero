@@ -128,7 +128,7 @@ GO111MODULE=on GOPROXY=https://goproxy.cn/,direct go get -u github.com/zeromicro
     docker run --rm -it -v `pwd`:/app kevinwan/goctl:latest-arm64 goctl --help
     ```
     
-    确保 goctl 可执行
+    确保 goctl 可执行，另外新增 -w=true，去掉handler等文件后缀,-prefix='x'生成缓存的时候加上一个key前缀
     
 2. 快速生成 api 服务
 

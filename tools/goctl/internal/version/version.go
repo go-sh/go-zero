@@ -3,6 +3,7 @@ package version
 import (
 	"encoding/json"
 	"strings"
+	"time"
 )
 
 // BuildVersion is the version of goctl.
@@ -12,7 +13,11 @@ var tag = map[string]int{"pre-alpha": 0, "alpha": 1, "pre-bata": 2, "beta": 3, "
 
 // GetGoctlVersion returns BuildVersion
 func GetGoctlVersion() string {
-	return BuildVersion
+	builder := strings.Builder{}
+	builder.Write([]byte(BuildVersion))
+	builder.Write([]byte("_"))
+	builder.Write([]byte(time.Now().Format("2006-01-02")))
+	return builder.String()
 }
 
 // IsVersionGreaterThan compares whether the current goctl version

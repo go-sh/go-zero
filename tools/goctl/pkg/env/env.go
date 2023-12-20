@@ -80,7 +80,7 @@ func init() {
 		goctlEnv.SetKV(GoctlExperimental, ExperimentalOn)
 	}
 
-	goctlEnv.SetKV(GoctlVersion, version.BuildVersion)
+	goctlEnv.SetKV(GoctlVersion, version.GetGoctlVersion())
 
 	protocVer, _ := protoc.Version()
 	goctlEnv.SetKV(ProtocVersion, protocVer)

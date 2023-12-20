@@ -31,7 +31,7 @@ var openCmd = map[string]string{
 
 func runE(_ *cobra.Command, _ []string) error {
 	env := getEnv()
-	content := fmt.Sprintf(issueTemplate, version.BuildVersion, env.string())
+	content := fmt.Sprintf(issueTemplate, version.GetGoctlVersion(), env.string())
 	content = url.QueryEscape(content)
 	url := fmt.Sprintf("https://github.com/zeromicro/go-zero/issues/new?body=%s", content)
 
