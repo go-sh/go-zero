@@ -16,6 +16,7 @@ import (
 )
 
 const typesFile = "types"
+const empty = ""
 
 //go:embed types.tpl
 var typesTemplate string
@@ -39,33 +40,56 @@ func BuildTypes(types []spec.Type) (string, error) {
 }
 
 func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
-	val, err := BuildTypes(api.Types)
-	if err != nil {
-		return err
+	typeGroup := map[string][]spec.Type{}
+	for _, obj := range api.Service.Groups {
+		group := empty
+		if v, ok := obj.Annotation.Properties["group"]; ok {
+			group = v
+		}
+		var types []spec.Type
+		for _, route := range obj.Routes {
+			types = append(types, route.ResponseType)
+			types = append(types, route.RequestType)
+		}
+		typeGroup[group] = types
 	}
 
-	typeFilename, err := format.FileNamingFormat(cfg.NamingFormat, typesFile)
-	if err != nil {
-		return err
+	for pkg, v := range typeGroup {
+		val, err := BuildTypes(v)
+		if err != nil {
+			return err
+		}
+		typeFilename, err := format.FileNamingFormat(cfg.NamingFormat, typesFile)
+		if err != nil {
+			return err
+		}
+
+		typeFilename = typeFilename + ".go"
+		filename := path.Join(dir, typesDir, typeFilename)
+		subDir := typesDir
+		if pkg != empty {
+			filename = path.Join(dir, typesDir, pkg, typeFilename)
+			subDir = path.Join(typesDir, pkg)
+		}
+		os.Remove(filename)
+		err = genFile(fileGenConfig{
+			dir:             dir,
+			subdir:          subDir,
+			filename:        typeFilename,
+			templateName:    "typesTemplate",
+			category:        category,
+			templateFile:    typesTemplateFile,
+			builtinTemplate: typesTemplate,
+			data: map[string]any{
+				"types":        val,
+				"containsTime": false,
+			},
+		})
+		if err != nil {
+			return err
+		}
 	}
-
-	typeFilename = typeFilename + ".go"
-	filename := path.Join(dir, typesDir, typeFilename)
-	os.Remove(filename)
-
-	return genFile(fileGenConfig{
-		dir:             dir,
-		subdir:          typesDir,
-		filename:        typeFilename,
-		templateName:    "typesTemplate",
-		category:        category,
-		templateFile:    typesTemplateFile,
-		builtinTemplate: typesTemplate,
-		data: map[string]any{
-			"types":        val,
-			"containsTime": false,
-		},
-	})
+	return nil
 }
 
 func writeType(writer io.Writer, tp spec.Type) error {

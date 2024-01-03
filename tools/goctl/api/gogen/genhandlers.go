@@ -40,10 +40,9 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 		handler = strings.Title(handler)
 		logicName = pkgName
 	}
-
 	return doGenToFile(dir, handler, cfg, group, route, handlerInfo{
 		PkgName:        pkgName,
-		ImportPackages: genHandlerImports(group, route, rootPkg),
+		ImportPackages: genHandlerImports(group, route, rootPkg, pkgName),
 		HandlerName:    handler,
 		RequestType:    util.Title(route.RequestTypeName()),
 		LogicName:      logicName,
@@ -86,13 +85,18 @@ func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec, wit
 	return nil
 }
 
-func genHandlerImports(group spec.Group, route spec.Route, parentPkg string) string {
+func genHandlerImports(group spec.Group, route spec.Route, parentPkg, pkgName string) string {
 	imports := []string{
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, getLogicFolderPath(group, route))),
 		fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)),
 	}
 	if len(route.RequestTypeName()) > 0 {
-		imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))
+		if pkgName != handler {
+			imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir, pkgName)))
+		} else {
+			imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))
+
+		}
 	}
 
 	return strings.Join(imports, "\n\t")

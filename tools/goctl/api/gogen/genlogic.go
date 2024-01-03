@@ -37,7 +37,6 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 		return err
 	}
 
-	imports := genLogicImports(route, rootPkg)
 	var responseString string
 	var returnString string
 	var requestString string
@@ -54,6 +53,8 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 	}
 
 	subDir := getLogicFolderPath(group, route)
+	pkgName := subDir[strings.LastIndex(subDir, "/")+1:]
+	imports := genLogicImports(route, rootPkg, pkgName)
 	return genFile(fileGenConfig{
 		dir:             dir,
 		subdir:          subDir,
@@ -63,7 +64,7 @@ func genLogicByRoute(dir, rootPkg string, cfg *config.Config, group spec.Group, 
 		templateFile:    logicTemplateFile,
 		builtinTemplate: logicTemplate,
 		data: map[string]string{
-			"pkgName":      subDir[strings.LastIndex(subDir, "/")+1:],
+			"pkgName":      pkgName,
 			"imports":      imports,
 			"logic":        strings.Title(logic),
 			"function":     strings.Title(strings.TrimSuffix(logic, "Logic")),
@@ -87,12 +88,16 @@ func getLogicFolderPath(group spec.Group, route spec.Route) string {
 	return path.Join(logicDir, folder)
 }
 
-func genLogicImports(route spec.Route, parentPkg string) string {
+func genLogicImports(route spec.Route, parentPkg, pkgName string) string {
 	var imports []string
 	imports = append(imports, `"context"`+"\n")
 	imports = append(imports, fmt.Sprintf("\"%s\"", pathx.JoinPackages(parentPkg, contextDir)))
 	if shallImportTypesPackage(route) {
-		imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))
+		if pkgName != logic {
+			imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir, pkgName)))
+		} else {
+			imports = append(imports, fmt.Sprintf("\"%s\"\n", pathx.JoinPackages(parentPkg, typesDir)))
+		}
 	}
 	imports = append(imports, fmt.Sprintf("\"%s/core/logx\"", vars.ProjectOpenSourceURL))
 	return strings.Join(imports, "\n\t")
