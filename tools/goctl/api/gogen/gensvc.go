@@ -29,7 +29,8 @@ func genServiceContext(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpe
 
 	for _, item := range middlewares {
 		middlewareStr += fmt.Sprintf("%s rest.Middleware\n", item)
-		name := strings.TrimSuffix(item, "Middleware") + "Middleware"
+		//name := strings.TrimSuffix(item, "Middleware") + "Middleware"
+		name := strings.TrimSuffix(item, "Middleware")
 		middlewareAssignment += fmt.Sprintf("%s: %s,\n", item,
 			fmt.Sprintf("middleware.New%s().%s", strings.Title(name), "Handle"))
 	}
