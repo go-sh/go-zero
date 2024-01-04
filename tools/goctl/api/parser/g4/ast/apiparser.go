@@ -234,9 +234,15 @@ func (p *Parser) storeVerificationInfo(api *Api) {
 	routeMap := func(list []*ServiceRoute, prefix string) {
 		for _, g := range list {
 			handler := g.GetHandler()
+			var group string
+			gp := g.AtServer.Kv.Get(groupKey)
+			if g != nil {
+				group = gp.Text()
+			}
 			if handler.IsNotNil() {
-				handlerName := handler.Text()
-				p.handlerMap[handlerName] = Holder
+				handlerKey := handler.Text()
+				handlerKey = group + handlerKey
+				p.handlerMap[handlerKey] = Holder
 				route := fmt.Sprintf("%s://%s", g.Route.Method.Text(), path.Join(prefix, g.Route.Path.Text()))
 				p.routeMap[route] = Holder
 			}
@@ -308,6 +314,7 @@ func (p *Parser) duplicateRouteCheck(nestedApi *Api) error {
 			if len(group) > 0 {
 				handlerKey = fmt.Sprintf("%s/%s", group, handler.Text())
 			}
+			handlerKey = group + handlerKey
 			if _, ok := p.handlerMap[handlerKey]; ok {
 				return fmt.Errorf("%s line %d:%d duplicate handler '%s'",
 					nestedApi.LinePrefix, handler.Line(), handler.Column(), handlerKey)
