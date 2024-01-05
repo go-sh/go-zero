@@ -40,26 +40,29 @@ func BuildTypes(types []spec.Type) (string, error) {
 }
 
 func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
-	typeGroup := map[string][]spec.Type{}
+	typeGroup := make(map[string][]spec.Type)
+	dup := map[string]struct{}{}
 	for _, obj := range api.Service.Groups {
 		group := empty
 		if v, ok := obj.Annotation.Properties["group"]; ok {
 			group = v
 		}
 		var types []spec.Type
-		typesM := map[string]struct{}{}
 		for _, route := range obj.Routes {
-			if _, ok := typesM[route.ResponseType.Name()]; !ok {
+			respKey := group + route.ResponseType.Name()
+			if _, ok := dup[respKey]; !ok {
 				types = append(types, route.ResponseType)
+				dup[respKey] = struct{}{}
 			}
-			if _, ok := typesM[route.RequestType.Name()]; !ok {
+			reqKey := group + route.RequestType.Name()
+			if _, ok := dup[reqKey]; !ok {
 				types = append(types, route.RequestType)
+				dup[reqKey] = struct{}{}
 			}
-			typesM[route.ResponseType.Name()] = struct{}{}
-			typesM[route.RequestType.Name()] = struct{}{}
 		}
-		typeGroup[group] = types
+		typeGroup[group] = append(typeGroup[group], types...)
 	}
+	fmt.Printf("pkg: %+v  \n", typeGroup)
 
 	for pkg, v := range typeGroup {
 		val, err := BuildTypes(v)
