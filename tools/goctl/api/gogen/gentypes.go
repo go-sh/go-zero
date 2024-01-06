@@ -66,7 +66,6 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 		}
 		typeGroup[group] = append(typeGroup[group], types...)
 	}
-	fmt.Printf("pkg: %+v  \n", typeGroup)
 
 	for pkg, v := range typeGroup {
 		val, err := BuildTypes(v)
