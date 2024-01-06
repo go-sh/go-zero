@@ -49,15 +49,19 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 		}
 		var types []spec.Type
 		for _, route := range obj.Routes {
-			respKey := group + route.ResponseType.Name()
-			if _, ok := dup[respKey]; !ok {
-				types = append(types, route.ResponseType)
-				dup[respKey] = struct{}{}
+			if route.ResponseType != nil {
+				respKey := group + route.ResponseType.Name()
+				if _, ok := dup[respKey]; !ok {
+					types = append(types, route.ResponseType)
+					dup[respKey] = struct{}{}
+				}
 			}
-			reqKey := group + route.RequestType.Name()
-			if _, ok := dup[reqKey]; !ok {
-				types = append(types, route.RequestType)
-				dup[reqKey] = struct{}{}
+			if route.RequestType != nil {
+				reqKey := group + route.RequestType.Name()
+				if _, ok := dup[reqKey]; !ok {
+					types = append(types, route.RequestType)
+					dup[reqKey] = struct{}{}
+				}
 			}
 		}
 		typeGroup[group] = append(typeGroup[group], types...)
