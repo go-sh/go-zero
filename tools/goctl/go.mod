@@ -3,7 +3,7 @@ module github.com/zeromicro/go-zero/tools/goctl
 go 1.19
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.1
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/emicklei/proto v1.13.0
 	github.com/fatih/structtag v1.2.0
 	github.com/go-sql-driver/mysql v1.7.1
@@ -42,7 +42,6 @@ require (
 	github.com/go-openapi/swag v0.22.4 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/gnostic-models v0.6.8 // indirect
