@@ -103,6 +103,8 @@ func (v *ApiVisitor) acceptService(root, final *Api) {
 			if len(group) > 0 {
 				handlerKey = fmt.Sprintf("%s/%s", group, handlerExpr.Text())
 			}
+
+			handlerKey = group + handlerKey
 			if _, ok := final.handlerM[handlerKey]; ok {
 				v.panic(handlerExpr, fmt.Sprintf("duplicate handler '%s'", handlerExpr.Text()))
 			}

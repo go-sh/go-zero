@@ -1,0 +1,306 @@
+syntax = "proto3";
+package order;
+option go_package = "./types";
+
+
+message IdReq{
+  optional int64 id = 1;
+  optional int64 user_id = 2;
+}
+message UpdateStatusReq{
+  optional int64 id = 1;
+  optional int64 user_id = 2;
+  optional int64 status = 3;
+}
+
+message BatchStatusReq{
+  repeated int64 id = 1;
+  optional int64 user_id = 2;
+  optional int64 status = 3;
+}
+message IdsReq{
+  repeated int64 ids = 1;
+  optional int64 user_id = 2;
+}
+message OkResp{
+  repeated int64 ids = 1;//影响的id数组
+  int64 count = 2;//影响的总数
+}
+
+message Page{
+  int64 total_page = 1;//总共多少页
+  int64 total = 2;//总共多少条记录
+  int64 page_size = 3;//分页大小
+  int64 page_num = 4;//页码
+}
+
+message PlaceOrderReq{
+  optional int64 id = 1;//主键id
+  optional int64 app_id = 2;//应用id
+  optional int64 tenant_id = 3;//租户id
+  optional int64 user_id = 4;//用户id
+  optional string user_phone = 5;//用户手机号
+  optional string name = 6;//订单名称
+  optional int64 total_amount = 8;//总金额
+  optional int64 payment_amount = 9;//支付金额
+  optional int64 freight_amount = 10;//运费金额
+  optional int64 promotion_amount = 11;//促销优化金额
+  optional int64 point_amount = 12;//积分抵扣金额
+  optional int64 coupon_amount = 13;//优惠券抵扣金额
+  optional int64 use_points = 15;//使用的积分数
+  optional int64 payment_type = 16;//支付方式：0->未支付；1->支付宝；2->微信
+  optional int64 source_type = 17;//订单来源：0->PC订单；1->app订单
+  optional int64 order_type = 18;//订单类型：0->正常订单；1->秒杀订单
+  optional int64 delivery_id = 19;//物流单号(配送方式)
+  optional string delivery_company = 20;//物流公司
+  optional string receiver_name = 21;//收货人姓名
+  optional string receiver_phone = 22;//收货人电话
+  optional string receiver_post_code = 23;//收货人邮编
+  optional string receiver_province = 24;//省份/直辖市
+  optional string receiver_city = 25;//城市
+  optional string receiver_region = 26;//区
+  optional string receiver_address = 27;//详细地址
+  optional int64 auto_confirm_day = 28;//自动确认时间（天）
+  optional int64 bonus_amount = 29;//可获得的积分
+  optional int64 promotion_id = 30;//活动信息
+  optional string promotion_detail = 31;//活动信息
+  repeated OrderItemDoc order_items = 33;//订单商品列表
+}
+
+message OrderDoc{
+  optional int64 id = 1;//主键id
+  optional int64 app_id = 2;//应用id
+  optional int64 tenant_id = 3;//租户id
+  optional int64 user_id = 4;//用户id
+  optional string user_phone = 5;//用户手机号
+  optional string name = 6;//订单名称
+  optional string transaction_id = 7;//交易id
+  optional int64 total_amount = 8;//总金额
+  optional int64 payment_amount = 9;//支付金额
+  optional int64 freight_amount = 10;//运费金额
+  optional int64 promotion_amount = 11;//促销优化金额
+  optional int64 point_amount = 12;//积分抵扣金额
+  optional int64 coupon_amount = 13;//优惠券抵扣金额
+  optional int64 discount_amount = 14;//管理员后台调整订单使用的折扣金额
+  optional int64 use_points = 15;//使用的积分数
+  optional int64 payment_type = 16;//支付方式：0->未支付；1->支付宝；2->微信
+  optional int64 source_type = 17;//订单来源：0->PC订单；1->app订单
+  optional int64 order_type = 18;//订单类型：0->正常订单；1->秒杀订单
+  optional int64 delivery_id = 19;//物流单号(配送方式)
+  optional string delivery_company = 20;//物流公司
+  optional string receiver_name = 21;//收货人姓名
+  optional string receiver_phone = 22;//收货人电话
+  optional string receiver_post_code = 23;//收货人邮编
+  optional string receiver_province = 24;//省份/直辖市
+  optional string receiver_city = 25;//城市
+  optional string receiver_region = 26;//区
+  optional string receiver_address = 27;//详细地址
+  optional int64 auto_confirm_day = 28;//自动确认时间（天）
+  optional int64 bonus_points = 29;//可获得的积分
+  optional int64 promotion_id = 30;//活动信息
+  optional string promotion_detail = 31;//活动信息
+  optional int64 confirm_status = 32;//确认收货状态：0->未确认；1->已确认
+  optional int64 payment_time = 33;//支付时间
+  optional int64 status = 34;//订单状态：0->待付款；1->待发货；2->已发货；3->已完成；4->已关闭；5->无效订单
+  optional int64 sort = 37;
+  optional int64 version = 38;
+  optional int64 is_deleted = 39;
+  optional int64 deleted_time = 40;
+  optional int64 created_time = 41;
+  optional int64 updated_time = 42;
+  optional int64 created_by = 43;
+  optional int64 updated_by = 44;
+  optional int64 deleted_by = 45;
+  optional string note = 46;
+}
+
+message OrderReq{
+  OrderDoc doc = 1;
+}
+
+message FindOneOrderResp{
+  OrderDoc doc = 1;
+}
+
+message FindOrderReq{
+  optional int64 lte = 1 ;//时间范围选择 创建时间
+  optional int64 gte = 2;//时间范围选择
+  optional int64 status = 3;
+  optional int64 is_deleted = 4;
+  repeated int64 ids = 5;
+  optional string order_by = 6;//排序
+  bool is_limit_offset = 7;
+  int64 page_size = 8;
+  int64 page_num = 9;
+  optional int64 last_id = 10;
+}
+message FindOrderResp{
+  Page page = 1 [json_name = "page"];
+  repeated OrderDoc docs = 2 [json_name = "items"];
+}
+message BatchDmlOrderReq{
+  repeated OrderDoc docs = 1;
+}
+
+service Order {
+  rpc Create(PlaceOrderReq) returns(OkResp);
+  rpc Update(OrderReq) returns(OkResp);
+  rpc Delete(IdReq) returns(OkResp);
+  rpc DeleteSoft(IdReq) returns(OkResp);
+  rpc DeleteCache(IdReq)returns(OkResp);
+  rpc FindOne(IdReq) returns(FindOneOrderResp);
+  rpc FindOneByArgs(OrderReq) returns(FindOneOrderResp);
+  rpc Find(FindOrderReq) returns(FindOrderResp);
+  rpc BatchCreate(BatchDmlOrderReq) returns(OkResp);
+  rpc BatchUpdate(BatchDmlOrderReq) returns(OkResp);
+  rpc BatchDelete(IdsReq) returns(OkResp);
+  rpc BatchDeleteSoft(IdsReq) returns(OkResp);
+  rpc BatchDeleteCache(IdsReq)returns(OkResp);
+  rpc UpdateStatus(UpdateStatusReq)returns(OkResp);
+  rpc BatchUpdateStatus(BatchStatusReq)returns(OkResp);
+}
+
+message OrderItemDoc{
+  optional int64 id = 1;//主键id
+  optional int64 app_id = 2;//应用id
+  optional int64 tenant_id = 3;//租户id
+  optional int64 order_id = 4;//应用id
+  optional int64 product_id = 5;//产品id
+  optional string product_name = 6;//产品名称
+  optional string product_brand = 7;//产品图片
+  optional string product_image = 8;//产品图片
+  optional int64 product_amount = 10;//销售价格
+  optional int64 purchase_quantity = 11;//购买数量
+  optional int64 product_sku_id = 12;//sku_id
+  optional string product_sku_code = 14;//sku编码
+  optional string promotion_name = 15;//促销名称
+  optional int64 promotion_amount = 16;//促销优化金额（促销价、满减、阶梯价）
+  optional int64 coupon_amount = 17;//优惠券优惠分解金额
+  optional int64 point_amount = 18;//积分优惠分解金额
+  optional int64 actual_amount = 19;//该商品经过优惠后的分解金额
+  optional int64 bonus_points = 20;//赠送积分
+  optional string meta = 21;//商品销售属性
+  optional int64 status = 34;//订单状态：0->待付款；1->待发货；2->已发货；3->已完成；4->已关闭；5->无效订单
+  optional int64 sort = 37;
+  optional int64 version = 38;
+  optional int64 is_deleted = 39;
+  optional int64 deleted_time = 40;
+  optional int64 created_time = 41;
+  optional int64 updated_time = 42;
+  optional int64 created_by = 43;
+  optional int64 updated_by = 44;
+  optional int64 deleted_by = 45;
+  optional string note = 46;
+}
+
+message OrderItemReq{
+  OrderItemDoc doc = 1;
+}
+
+message FindOneOrderItemResp{
+  OrderItemDoc doc = 1;
+}
+
+message FindOrderItemReq{
+  optional int64 lte = 1 ;//时间范围选择 创建时间
+  optional int64 gte = 2;//时间范围选择
+  optional int64 status = 3;
+  optional int64 is_deleted = 4;
+  repeated int64 ids = 5;
+  optional string order_by = 6;//排序
+  bool is_limit_offset = 7;
+  int64 page_size = 8;
+  int64 page_num = 9;
+  optional int64 last_id = 10;
+}
+message FindOrderItemResp{
+  Page page = 1 [json_name = "page"];
+  repeated OrderItemDoc docs = 2 [json_name = "items"];
+}
+message BatchDmlOrderItemReq{
+  repeated OrderItemDoc docs = 1;
+}
+
+service order_item {
+  rpc Create(OrderItemReq) returns(OkResp);
+  rpc Update(OrderItemReq) returns(OkResp);
+  rpc Delete(IdReq) returns(OkResp);
+  rpc DeleteSoft(IdReq) returns(OkResp);
+  rpc DeleteCache(IdReq)returns(OkResp);
+  rpc FindOne(IdReq) returns(FindOneOrderItemResp);
+  rpc FindOneByArgs(OrderItemReq) returns(FindOneOrderItemResp);
+  rpc Find(FindOrderItemReq) returns(FindOrderItemResp);
+  rpc BatchCreate(BatchDmlOrderItemReq) returns(OkResp);
+  rpc BatchUpdate(BatchDmlOrderItemReq) returns(OkResp);
+  rpc BatchDelete(IdsReq) returns(OkResp);
+  rpc BatchDeleteSoft(IdsReq) returns(OkResp);
+  rpc BatchDeleteCache(IdsReq)returns(OkResp);
+  rpc UpdateStatus(UpdateStatusReq)returns(OkResp);
+  rpc BatchUpdateStatus(BatchStatusReq)returns(OkResp);
+}
+
+message LogDoc{
+  optional int64 id = 1;//订单id
+  optional int64 app_id = 2;//应用id
+  optional int64 tenant_id = 3;//租户id
+  optional int64 user_type = 4;//用户类型
+  optional int64 order_id = 5;//订单id
+  optional int64 status = 34;
+  optional int64 sort = 37;
+  optional int64 version = 38;
+  optional int64 is_deleted = 39;
+  optional int64 deleted_time = 40;
+  optional int64 created_time = 41;
+  optional int64 updated_time = 42;
+  optional int64 created_by = 43;
+  optional int64 updated_by = 44;
+  optional int64 deleted_by = 45;
+  optional string note = 46;
+}
+
+message LogReq{
+  LogDoc doc = 1;
+}
+
+message FindOneLogResp{
+  LogDoc doc = 1;
+}
+
+message FindLogReq{
+  optional int64 lte = 1 ;//时间范围选择 创建时间
+  optional int64 gte = 2;//时间范围选择
+  optional int64 status = 3;
+  optional int64 is_deleted = 4;
+  repeated int64 ids = 5;
+  optional string order_by = 6;//排序
+  bool is_limit_offset = 7;
+  int64 page_size = 8;
+  int64 page_num = 9;
+  optional int64 last_id = 10;
+}
+message FindLogResp{
+  Page page = 1 [json_name = "page"];
+  repeated LogDoc docs = 2 [json_name = "items"];
+}
+message BatchDmlLogReq{
+  repeated LogDoc docs = 1;
+}
+
+service log {
+  rpc Create(LogReq) returns(OkResp);
+  rpc Update(LogReq) returns(OkResp);
+  rpc Delete(IdReq) returns(OkResp);
+  rpc DeleteSoft(IdReq) returns(OkResp);
+  rpc DeleteCache(IdReq)returns(OkResp);
+  rpc FindOne(IdReq) returns(FindOneLogResp);
+  rpc FindOneByArgs(LogReq) returns(FindOneLogResp);
+  rpc Find(FindLogReq) returns(FindLogResp);
+  rpc BatchCreate(BatchDmlLogReq) returns(OkResp);
+  rpc BatchUpdate(BatchDmlLogReq) returns(OkResp);
+  rpc BatchDelete(IdsReq) returns(OkResp);
+  rpc BatchDeleteSoft(IdsReq) returns(OkResp);
+  rpc BatchDeleteCache(IdsReq)returns(OkResp);
+  rpc UpdateStatus(UpdateStatusReq)returns(OkResp);
+  rpc BatchUpdateStatus(BatchStatusReq)returns(OkResp);
+}
+

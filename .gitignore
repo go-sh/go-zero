@@ -8,7 +8,8 @@
 
 # Unignore all dirs
 !*/
-!api
+tools/goctl/Makefile
+/*
 
 # ignore
 **/.idea

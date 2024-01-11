@@ -23,3 +23,9 @@ image:
 	docker tag kevinwan/goctl:$(version)-arm64 kevinwan/goctl:latest-arm64
 	docker push kevinwan/goctl:$(version)-arm64
 	docker push kevinwan/goctl:latest-arm64
+
+
+
+rpc-gen:
+	./goctl rpc protoc testout/*.proto --go_out=testout/rpc --go-grpc_out=testout/rpc --zrpc_out=testout/rpc -m -home=/Users/xiaohan/soft/project/xiaohan/infra/templates -style=go_zero -w=true
+
