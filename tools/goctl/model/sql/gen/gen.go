@@ -359,6 +359,7 @@ func (g *defaultGenerator) genModelCustom(in parser.Table, withCache bool) (stri
 		Parse(text).
 		GoFmt(true)
 	output, err := t.Execute(map[string]any{
+		"dataType":              in.PrimaryKey.DataType,
 		"pkg":                   g.pkg,
 		"withCache":             withCache,
 		"upperStartCamelObject": in.Name.ToCamel(),
@@ -380,6 +381,7 @@ func (g *defaultGenerator) executeModel(table Table, code *code) (*bytes.Buffer,
 		Parse(text).
 		GoFmt(true)
 	output, err := t.Execute(map[string]any{
+		"dataType":    table.PrimaryKey.DataType,
 		"pkg":         g.pkg,
 		"imports":     code.importsCode,
 		"vars":        code.varsCode,
