@@ -27,7 +27,7 @@ image:
 
 
 rpc-gen:
-	./goctl rpc protoc testout/*.proto --go_out=testout/rpc --go-grpc_out=testout/rpc --zrpc_out=testout/rpc -m -home=/Users/xiaohan/soft/project/xiaohan/infra/templates -style=go_zero -w=true
+	./goctl rpc protoc testout/*.proto --go_out=testout/rpc --go-grpc_out=testout/rpc --zrpc_out=testout/rpc -m -home=/Users/x/soft/project/y/infra/templates -style=go_zero -w=true
 
 model-gen:
-	./goctl model mysql ddl --src *.sql -c --dir=./internal/model -home=/Users/xiaohan/soft/project/xiaohan/infra/templates -style=go_zero -prefix=infra -w=true
+	./goctl model mysql ddl --src *.sql -c --dir=./internal/model -home=/Users/x/soft/project/y/infra/templates -style=go_zero -prefix=infra -w=true
