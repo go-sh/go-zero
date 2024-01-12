@@ -1,19 +1,19 @@
 syntax = "v1"
 
-info(
-	title: "type title here"
-	desc: "type desc here"
-	author: "type author here"
-	email: "type email here"
+info (
+	title:   "type title here"
+	desc:    "type desc here"
+	author:  "type author here"
+	email:   "type email here"
 	version: "type version here"
 )
 
 //infra模块中access_method相关信息
 type CreateAccessMethodReq {
-	Name   *string `json:"name"`                  //名字
-	Kind   *int64  `json:"kind"`                  //类型 1:基础登录 2:社交登录 3:企业登录
+	Name   *string `json:"name"` //名字
+	Kind   *int64  `json:"kind"` //类型 1:基础登录 2:社交登录 3:企业登录
 	Status *int64  `json:"status,options=[-1,1]"` //状态  -1:禁用 1:启用
-	Note   *string `json:"note,optional"`         //备注
+	Note   *string `json:"note,optional"` //备注
 }
 
 type CreateAccessMethodResp {
@@ -23,12 +23,11 @@ type CreateAccessMethodResp {
 	Note *string `json:"note,optional"`
 }
 
-@server(
-	prefix: /api/x/v1/system/admin
-	group: access_method
+@server (
+	prefix:     /api/x/v1/system/admin
+	group:      access_method
 	middleware: Auth //校验token
 )
-
 service admin {
 	@doc "添加认证方式"
 	@handler Create
@@ -38,16 +37,18 @@ service admin {
 type CreateTemplateReq {
 	S string `json:"s"`
 }
+
 type CreateTemplateResp {
 	Code int64 `json:"code"`
 }
-@server(
-	prefix: /api/x/v1/system/template
+
+@server (
+	prefix:     /api/x/v1/system/template
 	middleware: Auth //校验token
 )
-
 service admin {
 	@doc "模版"
 	@handler Create
 	post /template (CreateTemplateReq) returns (CreateTemplateResp)
 }
+
