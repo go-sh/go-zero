@@ -26,7 +26,7 @@ type CreateAccessMethodResp {
 @server (
 	prefix:     /api/x/v1/system/admin
 	group:      access_method
-	middleware: Auth //校验token
+	middleware: AuthX //校验token
 )
 service admin {
 	@doc "添加认证方式"
