@@ -9,12 +9,6 @@ info (
 )
 
 //infra模块中access_method相关信息
-//type CreateAccessMethodReq {
-// Name   *string `json:"name"` //名字
-// Kind   *int64  `json:"kind"` //类型 1:基础登录 2:社交登录 3:企业登录
-// Status *int64  `json:"status,options=[-1,1]"` //状态  -1:禁用 1:启用
-// Note   *string `json:"note,optional"` //备注
-//}
 type CreateAccessMethodReq {
 	Products []ProductItem `json:"products"`
 }
@@ -50,21 +44,21 @@ service admin {
 	post /access-methods (CreateAccessMethodReq) returns (CreateAccessMethodResp)
 }
 
-//type CreateTemplateReq {
-// S string `json:"s"`
-//}
-//
-//type CreateTemplateResp {
-// Code int64 `json:"code"`
-//}
-//
-//@server (
-// prefix:     /api/x/v1/system/template
-// middleware: Auth //校验token
-//)
-//service admin {
-// @doc "模版"
-// @handler Create
-// post /template (CreateTemplateReq) returns (CreateTemplateResp)
-//}
-//
+type CreateTemplateReq {
+	S string `json:"s"`
+}
+
+type CreateTemplateResp {
+	Code int64 `json:"code"`
+}
+
+@server (
+	prefix:     /api/x/v1/system/template
+	middleware: Auth //校验token
+)
+service admin {
+	@doc "模版"
+	@handler Create
+	post /template (CreateTemplateReq) returns (CreateTemplateResp)
+}
+
