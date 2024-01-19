@@ -39,32 +39,75 @@ func BuildTypes(types []spec.Type) (string, error) {
 	return builder.String(), nil
 }
 
+func Foreach(obj spec.Type, keys map[string][]string) {
+	dfs := obj.(spec.DefineStruct)
+	for _, d := range dfs.Members {
+		switch d.Type.(type) {
+		case spec.ArrayType:
+			info := d.Type.(spec.ArrayType)
+			switch info.Value.(type) {
+			case spec.DefineStruct:
+				v := info.Value.(spec.DefineStruct)
+				keys[obj.Name()] = append(keys[obj.Name()], v.RawName)
+				Foreach(v, keys)
+			}
+		case spec.DefineStruct:
+			v := d.Type.(spec.DefineStruct)
+			keys[obj.Name()] = append(keys[obj.Name()], v.RawName)
+			Foreach(v, keys)
+		}
+	}
+}
+
 func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
-	typeGroup := make(map[string][]spec.Type)
+
 	dup := map[string]struct{}{}
+	dfGroup := make(map[string]string)
 	for _, obj := range api.Service.Groups {
 		group := empty
 		if v, ok := obj.Annotation.Properties["group"]; ok {
 			group = v
 		}
-		var types []spec.Type
 		for _, route := range obj.Routes {
 			if route.ResponseType != nil {
-				respKey := group + route.ResponseType.Name()
+				respKey := route.ResponseType.Name() + ":" + group
 				if _, ok := dup[respKey]; !ok {
-					types = append(types, route.ResponseType)
+					dfGroup[respKey] = group
 					dup[respKey] = struct{}{}
 				}
 			}
 			if route.RequestType != nil {
-				reqKey := group + route.RequestType.Name()
+				reqKey := route.RequestType.Name() + ":" + group
 				if _, ok := dup[reqKey]; !ok {
-					types = append(types, route.RequestType)
+					dfGroup[reqKey] = group
 					dup[reqKey] = struct{}{}
 				}
 			}
 		}
-		typeGroup[group] = append(typeGroup[group], types...)
+	}
+	for _, obj := range api.Types {
+		keys := make(map[string][]string) //当前结构体的所有子结构体名称名称
+		Foreach(obj, keys)
+		for _, arrays := range keys {
+			for _, arr := range arrays {
+				key := obj.Name() + ":"
+				for k, g := range dfGroup {
+					if strings.Contains(k, key) {
+						dfGroup[arr+":"+g] = g
+					}
+				}
+			}
+		}
+
+	}
+	typeGroup := make(map[string][]spec.Type)
+	for _, obj := range api.Types {
+		key := obj.Name() + ":"
+		for k, v := range dfGroup {
+			if strings.Contains(k, key) {
+				typeGroup[v] = append(typeGroup[v], obj)
+			}
+		}
 	}
 
 	for pkg, v := range typeGroup {
