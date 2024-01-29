@@ -17,6 +17,7 @@ const (
 	etc      = "etc"
 	internal = "internal"
 	config   = "config"
+	entity   = "entity"
 	logic    = "logic"
 	server   = "server"
 	svc      = "svc"
@@ -33,6 +34,7 @@ type (
 		GetInternal() Dir
 		GetConfig() Dir
 		GetLogic() Dir
+		GetEntity() Dir
 		GetServer() Dir
 		GetSvc() Dir
 		GetPb() Dir
@@ -65,6 +67,7 @@ func mkdir(ctx *ctx.ProjectContext, proto parser.Proto, conf *conf.Config, c *ZR
 	internalDir := filepath.Join(ctx.WorkDir, "internal")
 	configDir := filepath.Join(internalDir, "config")
 	logicDir := filepath.Join(internalDir, "logic")
+	entityDir := filepath.Join(internalDir, "entity")
 	serverDir := filepath.Join(internalDir, "server")
 	svcDir := filepath.Join(internalDir, "svc")
 	pbDir := filepath.Join(ctx.WorkDir, proto.GoPackage)
@@ -145,6 +148,7 @@ func mkdir(ctx *ctx.ProjectContext, proto parser.Proto, conf *conf.Config, c *ZR
 			return getChildPackage(internalDir, childPath)
 		},
 	}
+
 	inner[config] = Dir{
 		Filename: configDir,
 		Package:  filepath.ToSlash(filepath.Join(ctx.Path, strings.TrimPrefix(configDir, ctx.Dir))),
@@ -159,6 +163,14 @@ func mkdir(ctx *ctx.ProjectContext, proto parser.Proto, conf *conf.Config, c *ZR
 		Base:     filepath.Base(logicDir),
 		GetChildPackage: func(childPath string) (string, error) {
 			return getChildPackage(logicDir, childPath)
+		},
+	}
+	inner[entity] = Dir{
+		Filename: entityDir,
+		Package:  filepath.ToSlash(filepath.Join(ctx.Path, strings.TrimPrefix(entityDir, ctx.Dir))),
+		Base:     filepath.Base(entityDir),
+		GetChildPackage: func(childPath string) (string, error) {
+			return getChildPackage(entityDir, childPath)
 		},
 	}
 	inner[server] = Dir{
@@ -244,6 +256,10 @@ func (d *defaultDirContext) GetConfig() Dir {
 
 func (d *defaultDirContext) GetLogic() Dir {
 	return d.inner[logic]
+}
+
+func (d *defaultDirContext) GetEntity() Dir {
+	return d.inner[entity]
 }
 
 func (d *defaultDirContext) GetServer() Dir {
