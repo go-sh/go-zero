@@ -81,6 +81,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 	dir := ctx.GetLogic()
 	for _, item := range proto.Service {
 		serviceName := item.Name
+		var _packageName string
 		for _, rpc := range item.RPC {
 			var (
 				err           error
@@ -108,6 +109,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 			if !withoutSuffix {
 				logicFilename, err = format.FileNamingFormat(cfg.NamingFormat, rpc.Name+"_logic")
 			}
+
 			if err != nil {
 				return err
 			}
@@ -125,7 +127,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 			if err != nil {
 				return err
 			}
-
+			_packageName = packageName
 			if err = util.With("logic").GoFmt(true).Parse(text).SaveTo(map[string]any{
 				"logicName":   logicName,
 				"functions":   functions,
@@ -135,6 +137,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 				return err
 			}
 		}
+		_ = g.GenEntity(ctx, serviceName, _packageName)
 	}
 	return nil
 }

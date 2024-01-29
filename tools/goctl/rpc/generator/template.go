@@ -9,6 +9,7 @@ import (
 const (
 	category                          = "rpc"
 	callTemplateFile                  = "call.tpl"
+	entityTemplateFile                = "entity.tpl"
 	callInterfaceFunctionTemplateFile = "call-interface-func.tpl"
 	callFunctionTemplateFile          = "call-func.tpl"
 	configTemplateFileFile            = "config.tpl"
@@ -26,6 +27,7 @@ var templates = map[string]string{
 	callTemplateFile:          callTemplateText,
 	configTemplateFileFile:    configTemplate,
 	etcTemplateFileFile:       etcTemplate,
+	entityTemplateFile:        entityTemplate,
 	logicTemplateFileFile:     logicTemplate,
 	logicFuncTemplateFileFile: logicFunctionTemplate,
 	mainTemplateFile:          mainTemplate,
