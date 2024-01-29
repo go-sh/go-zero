@@ -137,8 +137,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 				return err
 			}
 		}
-		err := g.GenEntity(ctx, serviceName, _packageName)
-		fmt.Printf("err --- >%+v", err)
+		_ = g.GenEntity(ctx, serviceName, _packageName)
 	}
 	return nil
 }
