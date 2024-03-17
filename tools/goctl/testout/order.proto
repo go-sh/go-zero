@@ -221,7 +221,7 @@ message BatchDmlOrderItemReq{
   repeated OrderItemDoc docs = 1;
 }
 
-service order_item {
+service OrderItem {
   rpc Create(OrderItemReq) returns(OkResp);
   rpc Update(OrderItemReq) returns(OkResp);
   rpc Delete(IdReq) returns(OkResp);
@@ -286,7 +286,7 @@ message BatchDmlLogReq{
   repeated LogDoc docs = 1;
 }
 
-service log {
+service Log {
   rpc Create(LogReq) returns(OkResp);
   rpc Update(LogReq) returns(OkResp);
   rpc Delete(IdReq) returns(OkResp);

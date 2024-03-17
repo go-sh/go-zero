@@ -48,7 +48,9 @@ func (g *Generator) genCallGroup(ctx DirContext, proto parser.Proto, cfg *conf.C
 	dir := ctx.GetCall()
 	head := util.GetHead(proto.Name)
 	for _, service := range proto.Service {
-		childPkg, err := dir.GetChildPackage(service.Name)
+		pkgName := stringx.From(service.Name).ToSnake()
+
+		childPkg, err := dir.GetChildPackage(pkgName)
 		if err != nil {
 			return err
 		}
@@ -57,7 +59,6 @@ func (g *Generator) genCallGroup(ctx DirContext, proto parser.Proto, cfg *conf.C
 		if err != nil {
 			return err
 		}
-
 		childDir := filepath.Base(childPkg)
 		filename := filepath.Join(dir.Filename, childDir, fmt.Sprintf("%s.go", callFilename))
 		isCallPkgSameToPbPkg := childDir == ctx.GetProtoGo().Filename

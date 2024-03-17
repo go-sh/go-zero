@@ -57,21 +57,20 @@ func (g *Generator) genServerGroup(ctx DirContext, proto parser.Proto, cfg *conf
 		if err != nil {
 			return err
 		}
+		pkgName := stringx.From(service.Name).ToSnake()
 
-		serverChildPkg, err := dir.GetChildPackage(service.Name)
+		serverChildPkg, err := dir.GetChildPackage(pkgName)
 		if err != nil {
 			return err
 		}
 
-		logicChildPkg, err := ctx.GetLogic().GetChildPackage(service.Name)
+		logicChildPkg, err := ctx.GetLogic().GetChildPackage(pkgName)
 		if err != nil {
 			return err
 		}
-
 		serverDir := filepath.Base(serverChildPkg)
 		logicImport = fmt.Sprintf(`"%v"`, logicChildPkg)
 		serverFile = filepath.Join(dir.Filename, serverDir, serverFilename+".go")
-
 		svcImport := fmt.Sprintf(`"%v"`, ctx.GetSvc().Package)
 		pbImport := fmt.Sprintf(`"%v"`, ctx.GetPb().Package) //pb types
 
@@ -79,7 +78,6 @@ func (g *Generator) genServerGroup(ctx DirContext, proto parser.Proto, cfg *conf
 		imports.AddStr(logicImport, svcImport, pbImport)
 
 		head := util.GetHead(proto.Name)
-
 		funcList, err := g.genFunctions(proto.PbPackage, service, true, withoutSuffix)
 		if err != nil {
 			return err
@@ -103,7 +101,6 @@ func (g *Generator) genServerGroup(ctx DirContext, proto parser.Proto, cfg *conf
 		//	unimplementedServer = fmt.Sprintf("%s.Unimplemented%sServer", proto.PbPackage,
 		//		stringx.From(service.Name).ToCamel())
 		//}
-		pkgName := stringx.From(service.Name).ToSnake()
 
 		if err = util.With("server").GoFmt(true).Parse(text).SaveTo(map[string]any{
 			"pkgName":             pkgName,
@@ -205,7 +202,7 @@ func (g *Generator) genFunctions(goPackage string, service parser.Service, multi
 				nameJoin = fmt.Sprintf("%s_logic", service.Name)
 				logicName = fmt.Sprintf("%sLogic", stringx.From(rpc.Name).ToCamel())
 			}
-			logicPkg = strings.ToLower(stringx.From(nameJoin).ToCamel())
+			logicPkg = strings.ToLower(stringx.From(nameJoin).ToSnake())
 		}
 
 		comment := parser.GetComment(rpc.Doc())
@@ -230,6 +227,7 @@ func (g *Generator) genFunctions(goPackage string, service parser.Service, multi
 			"streamBody": streamServer,
 			"logicPkg":   logicPkg,
 		})
+
 		if err != nil {
 			return nil, err
 		}

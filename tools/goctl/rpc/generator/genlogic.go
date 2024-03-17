@@ -81,7 +81,8 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 	dir := ctx.GetLogic()
 	for _, item := range proto.Service {
 		serviceName := item.Name
-		var _packageName string
+		var _packageName, originPackageName string
+		originPackageName = serviceName
 		for _, rpc := range item.RPC {
 			var (
 				err           error
@@ -90,21 +91,21 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 				logicFilename string
 				packageName   string
 			)
-			logicName = fmt.Sprintf("%s", stringx.From(rpc.Name).ToCamel())
-			if !withoutSuffix {
-				logicName = fmt.Sprintf("%sLogic", stringx.From(rpc.Name).ToCamel())
-			}
-			childPkg, err := dir.GetChildPackage(serviceName)
-			if err != nil {
-				return err
-			}
 
-			serviceDir := filepath.Base(childPkg)
 			nameJoin := fmt.Sprintf("%s", serviceName)
 			if !withoutSuffix {
 				nameJoin = fmt.Sprintf("%s_logic", serviceName)
 			}
-			packageName = strings.ToLower(stringx.From(nameJoin).ToCamel())
+			logicName = fmt.Sprintf("%s", stringx.From(rpc.Name).ToCamel())
+			if !withoutSuffix {
+				logicName = fmt.Sprintf("%sLogic", stringx.From(rpc.Name).ToCamel())
+			}
+			if err != nil {
+				return err
+			}
+
+			packageName = strings.ToLower(stringx.From(nameJoin).ToSnake())
+			childPkg, err := dir.GetChildPackage(packageName)
 			logicFilename, err = format.FileNamingFormat(cfg.NamingFormat, rpc.Name)
 			if !withoutSuffix {
 				logicFilename, err = format.FileNamingFormat(cfg.NamingFormat, rpc.Name+"_logic")
@@ -113,7 +114,7 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 			if err != nil {
 				return err
 			}
-
+			serviceDir := filepath.Base(childPkg)
 			filename = filepath.Join(dir.Filename, serviceDir, logicFilename+".go")
 			functions, err := g.genLogicFunction(serviceName, proto.PbPackage, logicName, rpc, withoutSuffix)
 			if err != nil {
@@ -127,7 +128,6 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 			if err != nil {
 				return err
 			}
-			_packageName = packageName
 			if err = util.With("logic").GoFmt(true).Parse(text).SaveTo(map[string]any{
 				"logicName":   logicName,
 				"functions":   functions,
@@ -136,8 +136,9 @@ func (g *Generator) genLogicGroup(ctx DirContext, proto parser.Proto, cfg *conf.
 			}, filename, false); err != nil {
 				return err
 			}
+			_packageName = packageName
 		}
-		_ = g.GenEntity(ctx, serviceName, _packageName)
+		_ = g.GenEntity(ctx, serviceName, _packageName, originPackageName)
 	}
 	return nil
 }

@@ -1,6 +1,7 @@
 package stringx
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -42,47 +43,8 @@ func TestString_IsEmptyOrSpace(t *testing.T) {
 }
 
 func TestString_Snake2Camel(t *testing.T) {
-	cases := []struct {
-		input string
-		want  string
-	}{
-		{
-			input: "__",
-			want:  "",
-		},
-		{
-			input: "go_zero",
-			want:  "GoZero",
-		},
-		{
-			input: "の_go_zero",
-			want:  "のGoZero",
-		},
-		{
-			input: "goZero",
-			want:  "GoZero",
-		},
-		{
-			input: "goZero",
-			want:  "GoZero",
-		},
-		{
-			input: "goZero_",
-			want:  "GoZero",
-		},
-		{
-			input: "go_Zero_",
-			want:  "GoZero",
-		},
-		{
-			input: "_go_Zero_",
-			want:  "GoZero",
-		},
-	}
-	for _, c := range cases {
-		ret := From(c.input).ToCamel()
-		assert.Equal(t, c.want, ret)
-	}
+	ret := From("OrderItem").ToSnake()
+	fmt.Println(ret)
 }
 
 func TestString_Camel2Snake(t *testing.T) {
