@@ -104,7 +104,15 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 	for _, obj := range api.Types {
 		key := obj.Name() + ":"
 		for k, v := range dfGroup {
-			if strings.Contains(k, key) {
+			//if strings.Contains(k, key) {
+			//	typeGroup[v] = append(typeGroup[v], obj)
+			//}
+
+			arr := strings.Split(k, ":")
+			if len(arr) >= 2 {
+				fmt.Println("key", k, arr[0], arr[1], obj.Name())
+			}
+			if arr[0]+":" == key {
 				typeGroup[v] = append(typeGroup[v], obj)
 			}
 		}

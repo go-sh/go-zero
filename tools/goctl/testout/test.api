@@ -8,57 +8,145 @@ info (
 	version: "type version here"
 )
 
-//infra模块中access_method相关信息
-type CreateAccessMethodReq {
-	Products []ProductItem `json:"products"`
+type OkResp {
+	Code    int64       `json:"code"` //业务编码 200是正常,非200是异常
+	Message string      `json:"message"` //code对应的描述
+	Data    interface{} `json:"data"` //返回的数据部分
 }
 
-type ProductItem {
-	ProductId  []ProductSkuItem `json:"product_id"`
-	ProductSku ProductSkuItemV2 `json:"productSkuItem"`
+type CreateMaterialReq {
+	AccountId  *string `json:"account_id"` //账号id
+	Url        *string `json:"url"` //文件路径
+	MediaType  *string `json:"media_type"` //目前支持图片
+	OpenStatus *int64  `json:"open_status,options=[-1,1],default=1"`
 }
 
-//促销券什么的可以加到这个字段里面
-type ProductSkuItem {
-	Id               string `json:"id"`
-	PurchaseQuantity int32  `json:"purchase_quantity"`
-	Price            int64  `json:"price"`
+type FindMaterialReq {
+	PageSize   int64    `form:"page_size,default=10"` //每页大小
+	PageNum    int64    `form:"page_num,default=0"` //页码
+	OrderBy    *string  `form:"order_by,default=created_time desc"`
+	OpenStatus *int64   `form:"open_status,optional"`
+	Ids        []string `form:"ids,optional"` //查询id的集合
+	Lte        *int64   `form:"lte,optional"` //时间范围选择
+	Gte        *int64   `form:"gte,optional"` //时间范围选择
+	Name       *string  `form:"name,optional"`
+	LastId     *string  `form:"last_id,optional"` //最后一条数据的id
+	AccountId  *string  `form:"account_id,optional"` //分类id
 }
 
-type ProductSkuItemV2 {
-	Id               string `json:"id"`
-	PurchaseQuantity int32  `json:"purchase_quantity"`
-	Price            int64  `json:"price"`
+type DeleteMaterialReq {
+	Id *string `path:"id"`
 }
 
-type CreateAccessMethodResp {}
-
-@server (
-	prefix:     /api/x/v1/system/admin
-	group:      access_method
-	middleware: AuthX //校验token
-)
-service admin {
-	@doc "添加认证方式"
-	@handler Create
-	post /access-methods (CreateAccessMethodReq) returns (CreateAccessMethodResp)
-}
-
-type CreateTemplateReq {
-	S string `json:"s"`
-}
-
-type CreateTemplateResp {
-	Code int64 `json:"code"`
+type BatchDeleteMaterialReq {
+	Ids []string `json:"ids"` //id集合
 }
 
 @server (
-	prefix:     /api/x/v1/system/template
-	middleware: Auth //校验token
+	middleware: AuthX
+	group:      material
 )
 service admin {
-	@doc "模版"
+	@doc "添加素材"
 	@handler Create
-	post /template (CreateTemplateReq) returns (CreateTemplateResp)
+	post /materials (CreateMaterialReq) returns (OkResp)
+
+	@doc "获取素材列表"
+	@handler Find
+	get /materials (FindMaterialReq) returns (OkResp)
+
+	@doc "删除素材"
+	@handler Delete
+	delete /materials/:id (DeleteMaterialReq) returns (OkResp)
+
+	@doc "批量删除素材"
+	@handler BatchDelete
+	post /materials/batch/delete (BatchDeleteMaterialReq) returns (OkResp)
+}
+
+type CreateDraftReq {
+	ArticleId          *string `json:"article_id"`
+	AccountId          *string `json:"account_id"` //账号id
+	Author             *string `json:"author"` //作者
+	Title              *string `json:"title"` //作者
+	Digest             *string `json:"digest"` //摘要
+	Content            *string `json:"content"` //正文
+	ContentSourceUrl   *string `json:"content_source_url,optional"`
+	ThumbMediaId       *string `json:"thumb_media_id"` //封面图
+	NeedOpenComment    *int64  `json:"need_open_comment,options=[0,1],default=0"` //是否打开评论
+	OnlyFansCanComment *int64  `json:"only_fans_can_comment,options=[0,1],default=0"` //是否粉丝才可评论
+	PicCrop2351        *string `json:"pic_crop_235_1,optional"` //2.35:1 坐标
+	PicCrop11          *string `json:"pic_crop_1_1,optional"` //1:1坐标
+	OpenStatus         *int64  `json:"open_status,options=[-1,1],default=1"`
+}
+
+type FindDraftReq {
+	PageSize   int64    `form:"page_size,default=10"` //每页大小
+	PageNum    int64    `form:"page_num,default=0"` //页码
+	OrderBy    *string  `form:"order_by,default=created_time desc"`
+	OpenStatus *int64   `form:"open_status,optional"`
+	Ids        []string `form:"ids,optional"` //查询id的集合
+	Lte        *int64   `form:"lte,optional"` //时间范围选择
+	Gte        *int64   `form:"gte,optional"` //时间范围选择
+	Name       *string  `form:"name,optional"`
+	LastId     *string  `form:"last_id,optional"` //最后一条数据的id
+	AccountId  *string  `form:"account_id,optional"` //分类id
+}
+
+type BatchDeleteDraftReq {
+	Ids []string `json:"ids"`
+}
+
+type DeleteDraftReq {
+	Id *string `json:"id"`
+}
+
+type UpdateDraftedStatusReq {
+	Id            *string `path:"id"`
+	DraftedStatus *int64  `json:"drafted_status"`
+}
+
+type UpdatePublishedStatusReq {
+	Id              *string `path:"id"`
+	PublishedStatus *int64  `json:"published_status"`
+}
+
+type UpdateAuditedStatusReq {
+	Id            *string `path:"id"`
+	AuditedStatus *int64  `json:"audited_status"`
+}
+
+@server (
+	middleware: AuthX
+	group:      draft
+)
+service admin {
+	@doc "添加草稿箱"
+	@handler Create
+	post /drafts (CreateDraftReq) returns (OkResp)
+
+	@doc "获取草稿箱列表"
+	@handler Find
+	get /drafts (FindDraftReq) returns (OkResp)
+
+	@doc "删除草稿箱"
+	@handler Delete
+	delete /drafts/:id (DeleteDraftReq) returns (OkResp)
+
+	@doc "批量删除草稿箱"
+	@handler BatchDelete
+	post /drafts/batch/delete (BatchDeleteDraftReq) returns (OkResp)
+
+	@doc "起草"
+	@handler UpdateDraftedStatus
+	put /drafts/drafted/:id (UpdateDraftedStatusReq) returns (OkResp)
+
+	@doc "发布"
+	@handler UpdatePublishedStatus
+	put /drafts/published/:id (UpdatePublishedStatusReq) returns (OkResp)
+
+	@doc "审核"
+	@handler UpdateAuditedStatus
+	put /drafts/audited/:id (UpdateAuditedStatusReq) returns (OkResp)
 }
 
