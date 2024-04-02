@@ -40,22 +40,18 @@ func genHandler(dir, rootPkg string, cfg *config.Config, group spec.Group, route
 		handler = strings.Title(handler)
 		logicName = pkgName
 	}
-	return doGenToFile(dir, handler, cfg, group, route, handlerInfo{
-		PkgName:        pkgName,
-		ImportPackages: genHandlerImports(group, route, rootPkg, pkgName),
-		HandlerName:    handler,
-		RequestType:    util.Title(route.RequestTypeName()),
-		LogicName:      logicName,
-		LogicType:      strings.Title(getLogicName(route, withoutSuffix)),
-		Call:           strings.Title(strings.TrimSuffix(handler, "Handler")),
-		HasResp:        len(route.ResponseTypeName()) > 0,
-		HasRequest:     len(route.RequestTypeName()) > 0,
-	})
-}
+	//return doGenToFile(dir, handler, cfg, group, route, handlerInfo{
+	//	PkgName:        pkgName,
+	//	ImportPackages: genHandlerImports(group, route, rootPkg, pkgName),
+	//	HandlerName:    handler,
+	//	RequestType:    util.Title(route.RequestTypeName()),
+	//	LogicName:      logicName,
+	//	LogicType:      strings.Title(getLogicName(route, withoutSuffix)),
+	//	Call:           strings.Title(strings.TrimSuffix(handler, "Handler")),
+	//	HasResp:        len(route.ResponseTypeName()) > 0,
+	//	HasRequest:     len(route.RequestTypeName()) > 0,
+	//})
 
-func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
-	route spec.Route, handleObj handlerInfo,
-) error {
 	filename, err := format.FileNamingFormat(cfg.NamingFormat, handler)
 	if err != nil {
 		return err
@@ -69,9 +65,53 @@ func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
 		category:        category,
 		templateFile:    handlerTemplateFile,
 		builtinTemplate: handlerTemplate,
-		data:            handleObj,
+		data: map[string]any{
+			"PkgName":        pkgName,
+			"ImportPackages": genHandlerImports(group, route, rootPkg, pkgName),
+			"HandlerName":    handler,
+			"RequestType":    util.Title(route.RequestTypeName()),
+			"LogicName":      logicName,
+			"LogicType":      strings.Title(getLogicName(route, withoutSuffix)),
+			"Call":           strings.Title(strings.TrimSuffix(handler, "Handler")),
+			"HasResp":        len(route.ResponseTypeName()) > 0,
+			"HasRequest":     len(route.RequestTypeName()) > 0,
+			"HasDoc":         len(route.JoinedDoc()) > 0,
+			"Doc":            getDoc(route.JoinedDoc()),
+		},
 	})
 }
+
+//func doGenToFile(dir, handler string, cfg *config.Config, group spec.Group,
+//	route spec.Route, handleObj handlerInfo,
+//) error {
+//	filename, err := format.FileNamingFormat(cfg.NamingFormat, handler)
+//	if err != nil {
+//		return err
+//	}
+//
+//	return genFile(fileGenConfig{
+//		dir:             dir,
+//		subdir:          getHandlerFolderPath(group, route),
+//		filename:        filename + ".go",
+//		templateName:    "handlerTemplate",
+//		category:        category,
+//		templateFile:    handlerTemplateFile,
+//		builtinTemplate: handlerTemplate,
+//		data: map[string]any{
+//			"PkgName":        pkgName,
+//			"ImportPackages": genHandlerImports(group, route, rootPkg),
+//			"HandlerName":    handler,
+//			"RequestType":    util.Title(route.RequestTypeName()),
+//			"LogicName":      logicName,
+//			"LogicType":      strings.Title(getLogicName(route)),
+//			"Call":           strings.Title(strings.TrimSuffix(handler, "Handler")),
+//			"HasResp":        len(route.ResponseTypeName()) > 0,
+//			"HasRequest":     len(route.RequestTypeName()) > 0,
+//			"HasDoc":         len(route.JoinedDoc()) > 0,
+//			"Doc":            getDoc(route.JoinedDoc()),
+//		},
+//	})
+//}
 
 func genHandlers(dir, rootPkg string, cfg *config.Config, api *spec.ApiSpec, withoutSuffix bool) error {
 	for _, group := range api.Service.Groups {

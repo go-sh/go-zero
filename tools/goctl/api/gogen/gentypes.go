@@ -109,9 +109,9 @@ func genTypes(dir string, cfg *config.Config, api *spec.ApiSpec) error {
 			//}
 
 			arr := strings.Split(k, ":")
-			if len(arr) >= 2 {
-				fmt.Println("key", k, arr[0], arr[1], obj.Name())
-			}
+			//if len(arr) >= 2 {
+			//	fmt.Println("key", k, arr[0], arr[1], obj.Name())
+			//}
 			if arr[0]+":" == key {
 				typeGroup[v] = append(typeGroup[v], obj)
 			}
